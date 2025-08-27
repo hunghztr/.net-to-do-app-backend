@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using ToDoList.Data;
 using ToDoList.Interfaces;
 using ToDoList.Models;
@@ -18,7 +19,31 @@ builder.Services.AddControllers(options =>
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // Thêm security definition
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Token Input"
+    });
+
+    // Thêm global security requirement
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            new string[] {}
+        }
+    });
+});
 
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
@@ -55,11 +80,22 @@ builder.Services.AddAuthentication(options =>
             System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])
         )
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            // Ném exception ?? middleware global b?t
+            throw new SecurityTokenException("Token invalid");
+        }
+    };
+
 });
 
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+
 var app = builder.Build();
+app.UseMiddleware<GlobalException>();
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -15,7 +15,7 @@ namespace ToDoList.Utils
                 {
                     StatusCode = result.StatusCode ?? 200,
                     Data = result.Value,
-                    Messsage = result.StatusCode >= 200 && result.StatusCode < 300 ? "Request Successful" : "Occurr..."
+                    Message = result.StatusCode >= 200 && result.StatusCode < 300 ? "Request Successful" : "Occurr..."
                 };
                 context.Result = new ObjectResult(res)
                 {

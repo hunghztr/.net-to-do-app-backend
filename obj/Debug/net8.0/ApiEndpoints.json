@@ -30,5 +30,15 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ToDoList.Controllers.HelloController",
+    "Method": "Get",
+    "RelativePath": "api/hello",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
   }
 ]
