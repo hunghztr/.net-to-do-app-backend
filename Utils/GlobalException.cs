@@ -18,36 +18,7 @@ namespace ToDoList.Utils
             try
             {
                 await _next(context);
-            }
-            catch (SecurityTokenExpiredException ex)
-            {
-                // Token hết hạn
-                _logger.LogWarning(ex, "Token expired");
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-
-                var response = new ApiResponse
-                {
-                    StatusCode = 401,
-                    Data = null,
-                    Message = "Token đã hết hạn"
-                };
-
-                await context.Response.WriteAsJsonAsync(response);
-            }
-            catch (SecurityTokenMalformedException ex)
-            {
-                _logger.LogWarning(ex, "Token malformed");
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                var response = new ApiResponse
-                {
-                    StatusCode = 401,
-                    Data = null,
-                    Message = "Token sai định dạng"
-                };
-                await context.Response.WriteAsJsonAsync(response);
-            }
+            } 
             catch (SecurityTokenException ex)
             {
                 // Token invalid (signature sai, issuer sai...)

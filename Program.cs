@@ -84,8 +84,7 @@ builder.Services.AddAuthentication(options =>
     {
         OnAuthenticationFailed = context =>
         {
-            // Ném exception ?? middleware global b?t
-            throw new SecurityTokenException("Token invalid");
+            throw new SecurityTokenException();
         }
     };
 
@@ -93,7 +92,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
-
+builder.Services.AddScoped<IToDoTaskRepository, ToDoTaskRepository>();
 var app = builder.Build();
 app.UseMiddleware<GlobalException>();
 app.UseAuthentication();

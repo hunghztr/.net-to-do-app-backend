@@ -2,9 +2,14 @@
 using Azure.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using ToDoList.Dtos;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using ToDoList.Dtos.Auth;
 using ToDoList.Interfaces;
 using ToDoList.Models;
+using ToDoList.Utils.Attribute;
 
 namespace ToDoList.Controllers
 {
@@ -31,7 +36,8 @@ namespace ToDoList.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterDto request)
         {
             var user = _mapper.Map<User>(request);
-            var result = await _userManager.CreateAsync(user,request.password);
+            user.RefreshToken = _tokenRepository.GenerateToken(user, "refresh");
+            var result = await _userManager.CreateAsync(user, request.password);
             if (result.Succeeded)
             {
                 var role = await _userManager.AddToRoleAsync(user, "User");
@@ -60,11 +66,13 @@ namespace ToDoList.Controllers
             var user = _mapper.Map<User>(request);
             var existingUser = await _userManager.FindByNameAsync(user.UserName);
 
-            if(existingUser == null) return Unauthorized("Bad credentials");
-            
+            if (existingUser == null) return Unauthorized("Bad credentials");
+
             var result = await _signInManager.CheckPasswordSignInAsync(existingUser, request.password, false);
             if (result.Succeeded)
             {
+                existingUser.RefreshToken = _tokenRepository.GenerateToken(user, "refresh");
+                await _userManager.UpdateAsync(existingUser);
                 return Ok(new
                 {
                     Username = existingUser.UserName,
@@ -72,7 +80,22 @@ namespace ToDoList.Controllers
                     RefreshToken = _tokenRepository.GenerateToken(user, "refresh")
                 });
             }
-                return Unauthorized("Bad credentials");
+            return Unauthorized("Bad credentials");
+        }
+        [HttpPost("refresh")]
+        public async Task<IActionResult> GetToken([FromBody] StringResult token)
+        {
+
+            var username = _tokenRepository.CheckToken(token.Result);
+            var user = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.UserName == username && u.RefreshToken == token.Result);
+            if (user == null) throw new SecurityTokenException();
+            return Ok(new
+            {
+                Username = user.UserName,
+                AccessToken = _tokenRepository.GenerateToken(user, "access"),
+                RefreshToken = _tokenRepository.GenerateToken(user, "refresh")
+            });
         }
     }
 }
