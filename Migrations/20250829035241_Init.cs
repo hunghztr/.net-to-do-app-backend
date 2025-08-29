@@ -18,6 +18,8 @@ namespace ToDoList.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
+                    description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -51,6 +53,22 @@ namespace ToDoList.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Permissions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Module = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Method = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Path = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Permissions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -166,7 +184,7 @@ namespace ToDoList.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "NVARCHAR(MAX)", nullable: false),
                     Status = table.Column<bool>(type: "bit", nullable: false),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
@@ -181,13 +199,84 @@ namespace ToDoList.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "RolePermissions",
+                columns: table => new
+                {
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PermissionId = table.Column<int>(type: "int", nullable: false),
+                    RoleId1 = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RolePermissions", x => new { x.RoleId, x.PermissionId });
+                    table.ForeignKey(
+                        name: "FK_RolePermissions_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RolePermissions_AspNetRoles_RoleId1",
+                        column: x => x.RoleId1,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_RolePermissions_Permissions_PermissionId",
+                        column: x => x.PermissionId,
+                        principalTable: "Permissions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                columns: new[] { "Id", "ConcurrencyStamp", "Discriminator", "Name", "NormalizedName", "description" },
                 values: new object[,]
                 {
-                    { "1", null, "User", "USER" },
-                    { "2", null, "Admin", "ADMIN" }
+                    { "1", null, "Role", "User", "USER", "" },
+                    { "2", null, "Role", "Admin", "ADMIN", "" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "RefreshToken", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "ad", 0, "c9ff1ef6-6d5d-4610-8eac-0473f293f568", null, false, false, null, null, "ADMIN", "AQAAAAIAAYagAAAAEJueN8z8I4nWjRdUIcwG1wJopPSgoRCaFMs1DIxv+sUhRR6kjMYRziEpKbofAyvjdA==", null, false, "", "c9d4b8f2-baed-40a9-af2e-7bd6e821b3eb", false, "admin" });
+
+            migrationBuilder.InsertData(
+                table: "Permissions",
+                columns: new[] { "Id", "Method", "Module", "Name", "Path" },
+                values: new object[,]
+                {
+                    { 1, "Post", "ToDoTask", "Create Task", "/api/tasks" },
+                    { 2, "Get", "ToDoTask", "Get All Tasks", "/api/tasks" },
+                    { 3, "Get", "ToDoTask", "Get Task By Id", "/api/tasks/{id}" },
+                    { 4, "Put", "ToDoTask", "Update Task", "/api/tasks/{id}" },
+                    { 5, "Delete", "ToDoTask", "Delete Task", "/api/tasks/{id}" },
+                    { 6, "Get", "ToDoTask", "Get All By Username", "/api/tasks/get-by-user" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[] { "2", "ad" });
+
+            migrationBuilder.InsertData(
+                table: "RolePermissions",
+                columns: new[] { "PermissionId", "RoleId", "RoleId1" },
+                values: new object[,]
+                {
+                    { 1, "1", null },
+                    { 3, "1", null },
+                    { 4, "1", null },
+                    { 5, "1", null },
+                    { 6, "1", null },
+                    { 1, "2", null },
+                    { 2, "2", null },
+                    { 3, "2", null },
+                    { 4, "2", null },
+                    { 5, "2", null },
+                    { 6, "2", null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -230,6 +319,16 @@ namespace ToDoList.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RolePermissions_PermissionId",
+                table: "RolePermissions",
+                column: "PermissionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RolePermissions_RoleId1",
+                table: "RolePermissions",
+                column: "RoleId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ToDoTasks_UserId",
                 table: "ToDoTasks",
                 column: "UserId");
@@ -254,10 +353,16 @@ namespace ToDoList.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "RolePermissions");
+
+            migrationBuilder.DropTable(
                 name: "ToDoTasks");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Permissions");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

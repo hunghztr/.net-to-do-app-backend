@@ -40,7 +40,7 @@ namespace ToDoList.Controllers
         {
             var username = User.FindFirst("name")?.Value;
             var user = await _userManager.FindByNameAsync(username);
-            if(user == null) return BadRequest("User not found");
+            if (user == null) return BadRequest("User not found");
             task.UserId = user.Id;
             var createdTask = await _toDoTaskRepository.Create(task);
             return CreatedAtAction(nameof(GetById), new { id = createdTask.Id }, createdTask);
@@ -61,6 +61,14 @@ namespace ToDoList.Controllers
             if (deletedTask == null) return BadRequest("Task not found");
             return Ok(deletedTask);
         }
-
+        [HttpGet("get-by-user")]
+        [Authorize]
+        public async Task<IActionResult> GetByUsername([FromQuery] QueryObject queryObject)
+        {
+            var username = User.FindFirst("name")?.Value;
+            var user = await _userManager.FindByNameAsync(username);
+            var result = await _toDoTaskRepository.GetAllByUsername(user, queryObject);
+            return Ok(result);
+        }
     }
 }

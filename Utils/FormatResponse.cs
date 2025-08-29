@@ -4,13 +4,13 @@ using ToDoList.Models;
 
 namespace ToDoList.Utils
 {
-    public class CustomFilter : IActionFilter
+    public class FormatResponse : IActionFilter
     {
         public void OnActionExecuted(ActionExecutedContext context)
         {
             if (context.Result is ObjectResult result)
             {
-               
+
                 ApiResponse res = new ApiResponse
                 {
                     StatusCode = result.StatusCode ?? 200,

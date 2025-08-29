@@ -60,6 +60,28 @@ namespace ToDoList.Repositories
             };
         }
 
+        public async Task<ResultDto<ToDoTaskDto>> GetAllByUsername(User user, QueryObject query)
+        {
+
+            var queryable = _context.ToDoTasks.AsQueryable();
+            int skip = (query.CurrentPage - 1) * query.PageSize;
+            var tasks =  await queryable.Where(t => t.UserId == user.Id)
+                .Skip(skip).Take(query.PageSize).ToListAsync();
+            var meta = new Meta
+            {
+                CurrentPage = query.CurrentPage,
+                PageSize = query.PageSize,
+                TotalCounts = queryable.Count(),
+                TotalPages = (int)Math.Ceiling((double)queryable.Count() / query.PageSize)
+            };
+            var tasksDto = tasks.Select(t => _mapper.Map<ToDoTaskDto>(t)).ToList();
+            return new ResultDto<ToDoTaskDto>
+            {
+                Datas = tasksDto,
+                Meta = meta
+            };
+        }
+
         public async Task<ToDoTaskDto> GetById(int id)
         {
             var task = await _context.ToDoTasks.FirstOrDefaultAsync(t => t.Id == id);

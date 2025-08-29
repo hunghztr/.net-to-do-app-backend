@@ -9,10 +9,8 @@ namespace ToDoList.Controllers
     public class HelloController : ControllerBase
     {
         [HttpGet]
-        [Authorize]
         public IActionResult Get()
         {
-            throw new ValidException("This is a custom exception for demonstration purposes.");
             return Ok("Hello, World!");
         }
     }

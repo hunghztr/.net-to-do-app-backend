@@ -13,5 +13,6 @@ namespace ToDoList.Interfaces
         Task<ToDoTaskDto> Delete(int id);
         Task<ResultDto<ToDoTaskDto>> GetAll(QueryObject query);
         Task<ToDoTaskDto> GetById(int id);
+        Task<ResultDto<ToDoTaskDto>> GetAllByUsername(User user, QueryObject query);
     }
 }

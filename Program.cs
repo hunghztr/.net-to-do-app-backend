@@ -15,7 +15,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add<CustomFilter>();
+    options.Filters.Add<Interceptor>();
+    options.Filters.Add<FormatResponse>();
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -84,6 +85,12 @@ builder.Services.AddAuthentication(options =>
     {
         OnAuthenticationFailed = context =>
         {
+            // token invalid
+            throw new SecurityTokenException();
+        },
+        OnChallenge = context =>
+        {
+            // token is null
             throw new SecurityTokenException();
         }
     };
