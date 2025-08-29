@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using ToDoList.Interfaces;
 using ToDoList.Models;
 
@@ -26,7 +27,7 @@ namespace ToDoList.Repositories
             var tokenDesc = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = typeToken == "access" ? DateTime.Now.AddMinutes(5) : DateTime.Now.AddMinutes(10),
+                Expires = typeToken == "access" ? DateTime.Now.AddHours(1) : DateTime.Now.AddHours(2),
                 SigningCredentials = creds,
                 Issuer = _configuration["JWT:Issuer"],
                 Audience = _configuration["JWT:Audience"]
@@ -34,6 +35,31 @@ namespace ToDoList.Repositories
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDesc);
             return tokenHandler.WriteToken(token);
+        }
+        public string CheckToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
+
+                var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = _configuration["JWT:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = _configuration["JWT:Audience"],
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+                return principal.FindFirst(JwtRegisteredClaimNames.Name)?.Value ?? "";
+            }
+            catch (SecurityTokenException e)
+            {
+                throw new SecurityTokenException();
+            }
         }
     }
 }

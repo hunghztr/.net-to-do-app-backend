@@ -1,6 +1,6 @@
-﻿namespace ToDoList.Dtos
+﻿namespace ToDoList.Dtos.Auth
 {
-    public class RegisterDto
+    public class LoginDto
     {
         public string username { get; set; }
         public string password { get; set; }

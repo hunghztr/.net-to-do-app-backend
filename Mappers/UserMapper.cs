@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using ToDoList.Dtos;
+using ToDoList.Dtos.Auth;
 using ToDoList.Models;
 
 namespace ToDoList.Mappers

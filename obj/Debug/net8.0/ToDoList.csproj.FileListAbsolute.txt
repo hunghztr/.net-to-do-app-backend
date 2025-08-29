@@ -152,4 +152,5 @@ C:\Users\tranh\source\repos\ToDoList\ToDoList\bin\Debug\net8.0\runtimes\win\lib\
 C:\Users\tranh\source\repos\ToDoList\ToDoList\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 C:\Users\tranh\source\repos\ToDoList\ToDoList\bin\Debug\net8.0\AutoMapper.dll
 C:\Users\tranh\source\repos\ToDoList\ToDoList\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\tranh\source\repos\ToDoList\ToDoList\obj\Debug\net8.0\ToDoList.sourcelink.json
 C:\Users\tranh\source\repos\ToDoList\ToDoList\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

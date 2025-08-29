@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using ToDoList.Utils.Attribute;
 
 namespace ToDoList.Models
@@ -8,11 +9,12 @@ namespace ToDoList.Models
         public int Id { get; set; }
         [Required]
         public string Title { get; set; }
-        public string description { get; set; }
+        [Column(TypeName = "NVARCHAR(MAX)")]
+        public string Description { get; set; }
         public bool Status { get; set; }
         [ValidDueDate]
         public DateTime DueDate { get; set; }
-        public int UserId { get; set; }
-        public User User { get; set; }
+        public string? UserId { get; set; }
+        public User? User { get; set; }
     }
 }

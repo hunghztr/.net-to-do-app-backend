@@ -12,7 +12,7 @@ using ToDoList.Data;
 namespace ToDoList.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250827032309_Init")]
+    [Migration("20250829035241_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -34,6 +34,11 @@ namespace ToDoList.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
                     b.Property<string>("Name")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -50,6 +55,10 @@ namespace ToDoList.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasDiscriminator().HasValue("IdentityRole");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -137,6 +146,13 @@ namespace ToDoList.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "ad",
+                            RoleId = "2"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -158,6 +174,162 @@ namespace ToDoList.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("ToDoList.Models.Permission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Method")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Module")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Permissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Method = "Post",
+                            Module = "ToDoTask",
+                            Name = "Create Task",
+                            Path = "/api/tasks"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Method = "Get",
+                            Module = "ToDoTask",
+                            Name = "Get All Tasks",
+                            Path = "/api/tasks"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Method = "Get",
+                            Module = "ToDoTask",
+                            Name = "Get Task By Id",
+                            Path = "/api/tasks/{id}"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Method = "Put",
+                            Module = "ToDoTask",
+                            Name = "Update Task",
+                            Path = "/api/tasks/{id}"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Method = "Delete",
+                            Module = "ToDoTask",
+                            Name = "Delete Task",
+                            Path = "/api/tasks/{id}"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Method = "Get",
+                            Module = "ToDoTask",
+                            Name = "Get All By Username",
+                            Path = "/api/tasks/get-by-user"
+                        });
+                });
+
+            modelBuilder.Entity("ToDoList.Models.RolePermission", b =>
+                {
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RoleId1")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("RoleId", "PermissionId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("RoleId1");
+
+                    b.ToTable("RolePermissions");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = "1",
+                            PermissionId = 1
+                        },
+                        new
+                        {
+                            RoleId = "1",
+                            PermissionId = 3
+                        },
+                        new
+                        {
+                            RoleId = "1",
+                            PermissionId = 4
+                        },
+                        new
+                        {
+                            RoleId = "1",
+                            PermissionId = 5
+                        },
+                        new
+                        {
+                            RoleId = "1",
+                            PermissionId = 6
+                        },
+                        new
+                        {
+                            RoleId = "2",
+                            PermissionId = 1
+                        },
+                        new
+                        {
+                            RoleId = "2",
+                            PermissionId = 2
+                        },
+                        new
+                        {
+                            RoleId = "2",
+                            PermissionId = 3
+                        },
+                        new
+                        {
+                            RoleId = "2",
+                            PermissionId = 4
+                        },
+                        new
+                        {
+                            RoleId = "2",
+                            PermissionId = 5
+                        },
+                        new
+                        {
+                            RoleId = "2",
+                            PermissionId = 6
+                        });
+                });
+
             modelBuilder.Entity("ToDoList.Models.ToDoTask", b =>
                 {
                     b.Property<int>("Id")
@@ -165,6 +337,10 @@ namespace ToDoList.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(MAX)");
 
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
@@ -176,19 +352,12 @@ namespace ToDoList.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId1")
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("ToDoTasks");
                 });
@@ -235,6 +404,10 @@ namespace ToDoList.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -256,6 +429,50 @@ namespace ToDoList.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "ad",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "c9ff1ef6-6d5d-4610-8eac-0473f293f568",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedUserName = "ADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJueN8z8I4nWjRdUIcwG1wJopPSgoRCaFMs1DIxv+sUhRR6kjMYRziEpKbofAyvjdA==",
+                            PhoneNumberConfirmed = false,
+                            RefreshToken = "",
+                            SecurityStamp = "c9d4b8f2-baed-40a9-af2e-7bd6e821b3eb",
+                            TwoFactorEnabled = false,
+                            UserName = "admin"
+                        });
+                });
+
+            modelBuilder.Entity("ToDoList.Models.Role", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityRole");
+
+                    b.Property<string>("description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue("Role");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            Name = "User",
+                            NormalizedName = "USER",
+                            description = ""
+                        },
+                        new
+                        {
+                            Id = "2",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN",
+                            description = ""
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -309,18 +526,51 @@ namespace ToDoList.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ToDoList.Models.RolePermission", b =>
+                {
+                    b.HasOne("ToDoList.Models.Permission", "Permission")
+                        .WithMany("rolePermissions")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ToDoList.Models.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ToDoList.Models.Role", null)
+                        .WithMany("rolePermissions")
+                        .HasForeignKey("RoleId1");
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("ToDoList.Models.ToDoTask", b =>
                 {
                     b.HasOne("ToDoList.Models.User", "User")
                         .WithMany("ToDoTasks")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ToDoList.Models.Permission", b =>
+                {
+                    b.Navigation("rolePermissions");
                 });
 
             modelBuilder.Entity("ToDoList.Models.User", b =>
                 {
                     b.Navigation("ToDoTasks");
+                });
+
+            modelBuilder.Entity("ToDoList.Models.Role", b =>
+                {
+                    b.Navigation("rolePermissions");
                 });
 #pragma warning restore 612, 618
         }
