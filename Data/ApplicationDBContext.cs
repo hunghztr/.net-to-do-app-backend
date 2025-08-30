@@ -15,6 +15,7 @@ namespace ToDoList.Data
         public DbSet<ToDoTask> ToDoTasks { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<UploadedFile> Files { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -46,7 +47,9 @@ namespace ToDoList.Data
                 new Permission{Id=3,Name="Get Task By Id",Module=ModuleEnum.ToDoTask.ToString(),Method=MethodEnum.Get.ToString(),Path="/api/tasks/{id}"},
                 new Permission{Id=4,Name="Update Task",Module=ModuleEnum.ToDoTask.ToString(),Method=MethodEnum.Put.ToString(),Path="/api/tasks/{id}"},
                 new Permission{Id=5,Name="Delete Task",Module=ModuleEnum.ToDoTask.ToString(),Method = MethodEnum.Delete.ToString(),Path="/api/tasks/{id}"},
-                new Permission{Id=6,Name="Get All By Username",Module=ModuleEnum.ToDoTask.ToString(),Method=MethodEnum.Get.ToString(),Path="/api/tasks/get-by-user"}
+                new Permission{Id=6,Name="Get All By Username",Module=ModuleEnum.ToDoTask.ToString(),Method=MethodEnum.Get.ToString(),Path="/api/tasks/get-by-user"},
+                new Permission{Id=7,Name="Create File",Module=ModuleEnum.UploadFile.ToString(),Method=MethodEnum.Post.ToString(),Path="/api/uploadfiles"},
+                new Permission{Id=8,Name="Download File",Module=ModuleEnum.UploadFile.ToString(),Method=MethodEnum.Post.ToString(),Path="/api/uploadfiles/download/{id}"},
             };
             List<RolePermission> rolePermissions = new List<RolePermission>
             {
@@ -56,6 +59,8 @@ namespace ToDoList.Data
                 new RolePermission{RoleId="1",PermissionId=4},
                 new RolePermission{RoleId="1",PermissionId=5},
                 new RolePermission{RoleId="1",PermissionId=6},
+                new RolePermission{RoleId="1",PermissionId=7},
+                new RolePermission{RoleId="1",PermissionId=8},
                 // Admin role permissions
                 new RolePermission{RoleId="2",PermissionId=1},
                 new RolePermission{RoleId="2",PermissionId=2},
@@ -63,6 +68,8 @@ namespace ToDoList.Data
                 new RolePermission{RoleId="2",PermissionId=4},
                 new RolePermission{RoleId="2",PermissionId=5},
                 new RolePermission{RoleId="2",PermissionId=6},
+                new RolePermission{RoleId="2",PermissionId=7},
+                new RolePermission{RoleId="2",PermissionId=8},
             };
             User admin = new User
             {

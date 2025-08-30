@@ -9,5 +9,7 @@ namespace ToDoList.Models
         public string RefreshToken { get; set; } = string.Empty;
         [JsonIgnore]
         public List<ToDoTask> ToDoTasks { get; set; } = new List<ToDoTask>();
+        [JsonIgnore]
+        public List<UploadedFile> Files { get; set; } = new List<UploadedFile>();
     }
 }

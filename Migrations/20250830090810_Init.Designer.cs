@@ -12,7 +12,7 @@ using ToDoList.Data;
 namespace ToDoList.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250829035241_Init")]
+    [Migration("20250830090810_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -250,6 +250,22 @@ namespace ToDoList.Migrations
                             Module = "ToDoTask",
                             Name = "Get All By Username",
                             Path = "/api/tasks/get-by-user"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Method = "Post",
+                            Module = "UploadFile",
+                            Name = "Create File",
+                            Path = "/api/uploadfiles"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Method = "Get",
+                            Module = "UploadFile",
+                            Name = "Download File",
+                            Path = "/api/uploadfiles/download{id}"
                         });
                 });
 
@@ -300,6 +316,16 @@ namespace ToDoList.Migrations
                         },
                         new
                         {
+                            RoleId = "1",
+                            PermissionId = 7
+                        },
+                        new
+                        {
+                            RoleId = "1",
+                            PermissionId = 8
+                        },
+                        new
+                        {
                             RoleId = "2",
                             PermissionId = 1
                         },
@@ -327,6 +353,16 @@ namespace ToDoList.Migrations
                         {
                             RoleId = "2",
                             PermissionId = 6
+                        },
+                        new
+                        {
+                            RoleId = "2",
+                            PermissionId = 7
+                        },
+                        new
+                        {
+                            RoleId = "2",
+                            PermissionId = 8
                         });
                 });
 
@@ -360,6 +396,38 @@ namespace ToDoList.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ToDoTasks");
+                });
+
+            modelBuilder.Entity("ToDoList.Models.UploadedFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("FileSize")
+                        .HasColumnType("float");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UploadDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UploaderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UploaderId");
+
+                    b.ToTable("UploadFiles");
                 });
 
             modelBuilder.Entity("ToDoList.Models.User", b =>
@@ -435,14 +503,14 @@ namespace ToDoList.Migrations
                         {
                             Id = "ad",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c9ff1ef6-6d5d-4610-8eac-0473f293f568",
+                            ConcurrencyStamp = "455e6793-dde9-4a64-87b9-c950cfc72e95",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJueN8z8I4nWjRdUIcwG1wJopPSgoRCaFMs1DIxv+sUhRR6kjMYRziEpKbofAyvjdA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEONg2BZlSoPWYrzH/fCW0BoXlsMn/65oM8sJMM5GcrrGuElcsbcteWysb9zYe/Vp5Q==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            SecurityStamp = "c9d4b8f2-baed-40a9-af2e-7bd6e821b3eb",
+                            SecurityStamp = "90895813-b35c-46c6-a1cc-78f1fec9c574",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         });
@@ -452,7 +520,7 @@ namespace ToDoList.Migrations
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityRole");
 
-                    b.Property<string>("description")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -464,14 +532,14 @@ namespace ToDoList.Migrations
                             Id = "1",
                             Name = "User",
                             NormalizedName = "USER",
-                            description = ""
+                            Description = "Default role for new users"
                         },
                         new
                         {
                             Id = "2",
                             Name = "Admin",
                             NormalizedName = "ADMIN",
-                            description = ""
+                            Description = "Administrator role with full permissions"
                         });
                 });
 
@@ -558,6 +626,15 @@ namespace ToDoList.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ToDoList.Models.UploadedFile", b =>
+                {
+                    b.HasOne("ToDoList.Models.User", "Uploader")
+                        .WithMany("Files")
+                        .HasForeignKey("UploaderId");
+
+                    b.Navigation("Uploader");
+                });
+
             modelBuilder.Entity("ToDoList.Models.Permission", b =>
                 {
                     b.Navigation("rolePermissions");
@@ -565,6 +642,8 @@ namespace ToDoList.Migrations
 
             modelBuilder.Entity("ToDoList.Models.User", b =>
                 {
+                    b.Navigation("Files");
+
                     b.Navigation("ToDoTasks");
                 });
 

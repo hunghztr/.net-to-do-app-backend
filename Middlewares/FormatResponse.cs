@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using ToDoList.Models;
+using ToDoList.Utils;
 
-namespace ToDoList.Utils
+namespace ToDoList.Middlewares
 {
     public class FormatResponse : IActionFilter
     {

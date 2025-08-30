@@ -1,4 +1,4 @@
-﻿namespace ToDoList.Models
+﻿namespace ToDoList.Utils
 {
     public class ApiResponse
     {

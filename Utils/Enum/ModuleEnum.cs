@@ -2,6 +2,6 @@
 {
     public enum ModuleEnum
     {
-        User, ToDoTask, Permission, Role
+        User, ToDoTask, Permission, Role, UploadFile
     }
 }

@@ -5,9 +5,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ToDoList.Data;
 using ToDoList.Interfaces;
+using ToDoList.Middlewares;
 using ToDoList.Models;
 using ToDoList.Repositories;
-using ToDoList.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +100,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IToDoTaskRepository, ToDoTaskRepository>();
+builder.Services.AddScoped<IUploadFileRepository, UploadFileRepository>();
 var app = builder.Build();
 app.UseMiddleware<GlobalException>();
 app.UseAuthentication();

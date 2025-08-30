@@ -1,7 +1,8 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using ToDoList.Models;
+using ToDoList.Utils;
 
-namespace ToDoList.Utils
+namespace ToDoList.Middlewares
 {
     public class GlobalException
     {

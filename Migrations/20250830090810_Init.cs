@@ -19,7 +19,7 @@ namespace ToDoList.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
-                    description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -200,6 +200,28 @@ namespace ToDoList.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UploadFiles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileSize = table.Column<double>(type: "float", nullable: false),
+                    FileType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UploadDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UploaderId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UploadFiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UploadFiles_AspNetUsers_UploaderId",
+                        column: x => x.UploaderId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RolePermissions",
                 columns: table => new
                 {
@@ -231,17 +253,17 @@ namespace ToDoList.Migrations
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Discriminator", "Name", "NormalizedName", "description" },
+                columns: new[] { "Id", "ConcurrencyStamp", "Description", "Discriminator", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "1", null, "Role", "User", "USER", "" },
-                    { "2", null, "Role", "Admin", "ADMIN", "" }
+                    { "1", null, "Default role for new users", "Role", "User", "USER" },
+                    { "2", null, "Administrator role with full permissions", "Role", "Admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "RefreshToken", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "ad", 0, "c9ff1ef6-6d5d-4610-8eac-0473f293f568", null, false, false, null, null, "ADMIN", "AQAAAAIAAYagAAAAEJueN8z8I4nWjRdUIcwG1wJopPSgoRCaFMs1DIxv+sUhRR6kjMYRziEpKbofAyvjdA==", null, false, "", "c9d4b8f2-baed-40a9-af2e-7bd6e821b3eb", false, "admin" });
+                values: new object[] { "ad", 0, "455e6793-dde9-4a64-87b9-c950cfc72e95", null, false, false, null, null, "ADMIN", "AQAAAAIAAYagAAAAEONg2BZlSoPWYrzH/fCW0BoXlsMn/65oM8sJMM5GcrrGuElcsbcteWysb9zYe/Vp5Q==", null, false, "", "90895813-b35c-46c6-a1cc-78f1fec9c574", false, "admin" });
 
             migrationBuilder.InsertData(
                 table: "Permissions",
@@ -253,7 +275,9 @@ namespace ToDoList.Migrations
                     { 3, "Get", "ToDoTask", "Get Task By Id", "/api/tasks/{id}" },
                     { 4, "Put", "ToDoTask", "Update Task", "/api/tasks/{id}" },
                     { 5, "Delete", "ToDoTask", "Delete Task", "/api/tasks/{id}" },
-                    { 6, "Get", "ToDoTask", "Get All By Username", "/api/tasks/get-by-user" }
+                    { 6, "Get", "ToDoTask", "Get All By Username", "/api/tasks/get-by-user" },
+                    { 7, "Post", "UploadFile", "Create File", "/api/uploadfiles" },
+                    { 8, "Get", "UploadFile", "Download File", "/api/uploadfiles/download{id}" }
                 });
 
             migrationBuilder.InsertData(
@@ -271,12 +295,16 @@ namespace ToDoList.Migrations
                     { 4, "1", null },
                     { 5, "1", null },
                     { 6, "1", null },
+                    { 7, "1", null },
+                    { 8, "1", null },
                     { 1, "2", null },
                     { 2, "2", null },
                     { 3, "2", null },
                     { 4, "2", null },
                     { 5, "2", null },
-                    { 6, "2", null }
+                    { 6, "2", null },
+                    { 7, "2", null },
+                    { 8, "2", null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -332,6 +360,11 @@ namespace ToDoList.Migrations
                 name: "IX_ToDoTasks_UserId",
                 table: "ToDoTasks",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UploadFiles_UploaderId",
+                table: "UploadFiles",
+                column: "UploaderId");
         }
 
         /// <inheritdoc />
@@ -357,6 +390,9 @@ namespace ToDoList.Migrations
 
             migrationBuilder.DropTable(
                 name: "ToDoTasks");
+
+            migrationBuilder.DropTable(
+                name: "UploadFiles");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

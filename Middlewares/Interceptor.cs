@@ -7,8 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using ToDoList.Data;
 using ToDoList.Models;
+using ToDoList.Utils;
 
-namespace ToDoList.Utils
+namespace ToDoList.Middlewares
 {
     public class Interceptor : IAsyncActionFilter
     {
@@ -21,7 +22,7 @@ namespace ToDoList.Utils
             new("/api/auth/register","Post"),
             new("api/auth/refresh","Post"),
             new("/swagger/index.html","Get"),
-
+            new("/api/uploadfiles/upload","Post")
         };
         public Interceptor(ILogger<Interceptor> logger, UserManager<User> userManager, ApplicationDBContext context)
         {
